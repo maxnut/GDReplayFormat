@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <optional>
 
 struct Bot
 {
@@ -48,6 +49,6 @@ struct Replay
 
 	std::vector<Input> inputs;
 
-	static Replay load(std::string path);
+	static std::optional<Replay> load(std::string path);
 	void save(std::string path, ExportMode exportMode = MSGPACK);
 };

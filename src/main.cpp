@@ -13,7 +13,7 @@ int main()
 
 	r.save("Replay", MSGPACK);
 
-	r = Replay::load("Replay.gdr");
+	r = Replay::load("Replay.gdr").value();
 
 	std::cout << r.author << "\n";
 	std::cout << r.description << "\n";
