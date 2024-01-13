@@ -8,7 +8,7 @@ using json = nlohmann::json;
 
 std::optional<Replay> Replay::load(std::string path)
 {
-	std::optional<Replay> replay;
+    Replay replay;
 
 	json replayJson;
 
@@ -44,18 +44,18 @@ std::optional<Replay> Replay::load(std::string path)
 		replayFile.close();
 	}
 
-	replay.value().gameVersion = replayJson["gameVersion"];
-	replay.value().description = replayJson["description"];
-	replay.value().version = replayJson["version"];
-	replay.value().duration = replayJson["duration"];
-	replay.value().botInfo.name = replayJson["bot"]["name"];
-	replay.value().botInfo.version = replayJson["bot"]["version"];
-	replay.value().levelInfo.id = replayJson["level"]["id"];
-	replay.value().levelInfo.name = replayJson["level"]["name"];
-	replay.value().author = replayJson["author"];
-	replay.value().seed = replayJson["seed"];
-	replay.value().coins = replayJson["coins"];
-	replay.value().ldm = replayJson["ldm"];
+	replay.gameVersion = replayJson["gameVersion"];
+	replay.description = replayJson["description"];
+	replay.version = replayJson["version"];
+	replay.duration = replayJson["duration"];
+	replay.botInfo.name = replayJson["bot"]["name"];
+	replay.botInfo.version = replayJson["bot"]["version"];
+	replay.levelInfo.id = replayJson["level"]["id"];
+	replay.levelInfo.name = replayJson["level"]["name"];
+	replay.author = replayJson["author"];
+	replay.seed = replayJson["seed"];
+	replay.coins = replayJson["coins"];
+	replay.ldm = replayJson["ldm"];
 
 	for (const json& inputJson : replayJson["inputs"])
 	{
@@ -64,10 +64,10 @@ std::optional<Replay> Replay::load(std::string path)
 		input.button = inputJson["btn"];
 		input.player2 = inputJson["2p"];
 		input.down = inputJson["down"];
-		replay.value().inputs.push_back(input);
+		replay.inputs.push_back(input);
 	}
 
-	return replay;
+	return std::optional<Replay>(replay);
 }
 
 void Replay::save(std::string path, ExportMode exportMode)
