@@ -157,10 +157,10 @@ class Replay {
 		}
 
 		if (exportJson) {
-			return json::to_msgpack(replayJson);
-		} else {
 			std::string replayString = replayJson.dump();
 			return std::vector<uint8_t>(replayString.begin(), replayString.end());
+		} else {
+			return json::to_msgpack(replayJson);
 		}
 	}
 };
