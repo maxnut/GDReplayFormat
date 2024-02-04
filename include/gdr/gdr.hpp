@@ -8,6 +8,11 @@
 
 namespace gdr {
 
+uint32_t frameForTime(double time)
+{
+	return static_cast<uint32_t>(time * 240);
+}
+
 using namespace nlohmann;
 
 struct Bot {
@@ -34,7 +39,7 @@ class Input {
  	template <typename, typename>
  	friend class Replay;
  public:
-	int frame;
+	uint32_t frame;
 	int button;
 	bool player2;
 	bool down;
