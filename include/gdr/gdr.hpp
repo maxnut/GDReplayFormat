@@ -8,7 +8,7 @@
 
 namespace gdr {
 
-uint32_t frameForTime(double time)
+static uint32_t frameForTime(double time)
 {
 	return static_cast<uint32_t>(time * 240);
 }
