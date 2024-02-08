@@ -80,6 +80,8 @@ class Replay {
 	float gameVersion;
 	float version = 1.0;
 
+	float framerate = 240.f;
+
 	int seed = 0;
     int coins = 0;
 
@@ -120,6 +122,9 @@ class Replay {
 		replay.seed = replayJson["seed"];
 		replay.coins = replayJson["coins"];
 		replay.ldm = replayJson["ldm"];
+		
+		if(replayJson.contains("framerate"))
+			replay.framerate = replayJson["framerate"];
 		replay.parseExtension(replayJson.get<json::object_t>());
 
 		for (json const& inputJson : replayJson["inputs"]) {
