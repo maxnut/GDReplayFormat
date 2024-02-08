@@ -155,6 +155,7 @@ class Replay {
 		replayJson["seed"] = seed;
 		replayJson["coins"] = coins;
 		replayJson["ldm"] = ldm;
+		replayJson["framerate"] = framerate;
 
 		for (InputType const& input : inputs) {
 			json inputJson = input.saveExtension();
