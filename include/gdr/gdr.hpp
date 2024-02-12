@@ -8,11 +8,6 @@
 
 namespace gdr {
 
-static uint32_t frameForTime(double time)
-{
-	return static_cast<uint32_t>(time * 240);
-}
-
 using namespace nlohmann;
 
 struct Bot {
@@ -91,6 +86,11 @@ class Replay {
 	Level levelInfo;
 
 	std::vector<InputType> inputs;
+
+	uint32_t frameForTime(double time)
+	{
+		return static_cast<uint32_t>(time * framerate);
+	}
 
 	virtual void parseExtension(json::object_t obj) {}
 	virtual json::object_t saveExtension() const {
