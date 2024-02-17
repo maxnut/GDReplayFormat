@@ -89,7 +89,7 @@ class Replay {
 
 	uint32_t frameForTime(double time)
 	{
-		return static_cast<uint32_t>(time * framerate);
+		return static_cast<uint32_t>(time * (double)framerate);
 	}
 
 	virtual void parseExtension(json::object_t obj) {}
