@@ -68,7 +68,6 @@ class Replay {
 	using InputType = T;
 	using Self = std::conditional_t<std::is_same_v<S, void>, Replay<S, T>, S>;
 
-	std::string name;
 	std::string author;
 	std::string description;
 
@@ -111,8 +110,6 @@ class Replay {
 			replayJson = json::parse(data);
 		}
 
-		if(replayJson.contains("name"))
-			replay.name = replayJson["name"];
 		replay.gameVersion = replayJson["gameVersion"];
 		replay.description = replayJson["description"];
 		replay.version = replayJson["version"];
@@ -149,7 +146,6 @@ class Replay {
 
 	std::vector<uint8_t> exportData(bool exportJson = false) {
 		json replayJson = saveExtension();
-		replayJson["name"] = name;
 		replayJson["gameVersion"] = gameVersion;
 		replayJson["description"] = description;
 		replayJson["version"] = version;
