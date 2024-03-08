@@ -111,7 +111,8 @@ class Replay {
 			replayJson = json::parse(data);
 		}
 
-		replay.name = replayJson["name"];
+		if(replayJson.contains("name"))
+			replay.name = replayJson["name"];
 		replay.gameVersion = replayJson["gameVersion"];
 		replay.description = replayJson["description"];
 		replay.version = replayJson["version"];
