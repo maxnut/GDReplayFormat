@@ -149,7 +149,7 @@ class Replay {
 		replayJson["gameVersion"] = gameVersion;
 		replayJson["description"] = description;
 		replayJson["version"] = version;
-		replayJson["duration"] = inputs[inputs.size() - 1].frame;
+		replayJson["duration"] = duration;
 		replayJson["bot"]["name"] = botInfo.name;
 		replayJson["bot"]["version"] = botInfo.version;
 		replayJson["level"]["id"] = levelInfo.id;
