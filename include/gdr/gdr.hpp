@@ -100,7 +100,7 @@ class Replay {
 	Replay(std::string const& botName, std::string const& botVersion)
 		: botInfo(botName, botVersion) {}
 
-	static Self importData(std::vector<uint8_t> const& data) {
+	static Self importData(std::vector<uint8_t> const& data, bool importInputs = true) {
 		Self replay;
 		json replayJson;
 
@@ -126,6 +126,9 @@ class Replay {
 		if(replayJson.contains("framerate"))
 			replay.framerate = replayJson["framerate"];
 		replay.parseExtension(replayJson.get<json::object_t>());
+
+		if(!importInputs)
+			return replay;
 
 		for (json const& inputJson : replayJson["inputs"]) {
 			InputType input;
