@@ -53,7 +53,7 @@ bool down; // if it is a hold or release input
 Add CPM dependency (make sure it is added AFTER the `add_subdirectory` line and BEFORE the `setup_geode_mod` line)
 
 ```
-CPMAddPackage("gh:maxnut/GDReplayFormat#4950cc2")
+CPMAddPackage("gh:maxnut/GDReplayFormat#commithash") // REPLACE commithash with a specific commit hash
 target_link_libraries(${PROJECT_NAME} libGDR)
 ```
 
@@ -144,4 +144,4 @@ macro = MyMacro::importData(macroData);
 
 # Extensions
 
-i'll write this part later but until then go to [test.cpp](./test/main.cpp)
+i'll write this part later but until then go to [test.cpp](./test/main.cpp) to go see how we do it for now
