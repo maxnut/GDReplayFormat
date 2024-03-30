@@ -80,7 +80,7 @@ struct MyMacro : gdr::Replay<MyMacro, MyInput> {
 
 ### Using .gdr
 
-Importing
+Exporting
 
 ```cpp
 MyMacro macro;
@@ -92,7 +92,7 @@ f.write(reinterpret_cast<const char *>(data.data()), data.size());
 f.close();
 ```
 
-Exporting
+Importing
 
 ```cpp
 MyMacro macro;
@@ -113,7 +113,7 @@ macro = MyMacro::importData(macroData);
 
 ### Using .gdr.json
 
-Importing
+Exporting
 
 ```cpp
 MyMacro macro;
@@ -125,7 +125,7 @@ f.write(reinterpret_cast<const char *>(data.data()), data.size());
 f.close();
 ```
 
-Exporting
+Importing
 
 ```cpp
 MyMacro macro;
