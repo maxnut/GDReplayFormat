@@ -200,6 +200,7 @@ These extensions can be accessed the same way you access regular fields
  - [iCreate Pro](https://icreate.pro) by camila314
  - [Prism Menu](https://github.com/FireMario211/Prism-Menu) by Firee
  - [xdBot](https://github.com/ZiLko/xdBot) by ZiLko
+ - [Eclipse Menu] by ninXout, prevter, maxnut, Firee and SpaghettDev
 
 ## Credits
 
