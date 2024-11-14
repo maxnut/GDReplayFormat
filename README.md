@@ -199,6 +199,8 @@ These extensions can be accessed the same way you access regular fields
  - [Crystal Client v5](https://github.com/ninXout/Crystal-Client) by ninXout
  - [iCreate Pro](https://icreate.pro) by camila314
  - [Prism Menu](https://github.com/FireMario211/Prism-Menu) by Firee
+ - [xdBot](https://github.com/ZiLko/xdBot) by ZiLko
+ - [Eclipse Menu](https://github.com/EclipseMenu/EclipseMenu) by Eclipse Team (ninXout, prevter, maxnut, Firee and SpaghettDev)
 
 ## Credits
 
