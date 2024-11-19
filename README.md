@@ -194,6 +194,7 @@ These extensions can be accessed the same way you access regular fields
 ## Bots using GDR
 
  - [MegaHack v8](https://absolllute.com) by Absolute
+ - [zBot](https://github.com/FigmentBoy/zBot) by FigmentBoy
  - [OpenHack](https://github.com/Prevter/OpenHack/) by Prevter
  - [GD Mega Overlay](https://github.com/maxnut/GDMegaOverlay) by maxnut
  - [Crystal Client v5](https://github.com/ninXout/Crystal-Client) by ninXout
