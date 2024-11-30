@@ -198,6 +198,7 @@ These extensions can be accessed the same way you access regular fields
  - [OpenHack](https://github.com/Prevter/OpenHack/) by Prevter
  - [GD Mega Overlay](https://github.com/maxnut/GDMegaOverlay) by maxnut
  - [Crystal Client v5](https://github.com/ninXout/Crystal-Client) by ninXout
+ - [Flero Client](https://flero.pages.dev) by Speedyfriend67
  - [iCreate Pro](https://icreate.pro) by camila314
  - [Prism Menu](https://github.com/FireMario211/Prism-Menu) by Firee
  - [xdBot](https://github.com/ZiLko/xdBot) by ZiLko
