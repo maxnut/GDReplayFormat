@@ -87,7 +87,7 @@ class Replay {
 
 	std::vector<InputType> inputs;
 
-	uint32_t frameForTime(double time)
+	uint32_t frameForTime(double time) const
 	{
 		return static_cast<uint32_t>(time * (double)framerate);
 	}
