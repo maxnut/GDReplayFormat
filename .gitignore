@@ -2,3 +2,5 @@
 /.vscode
 *.bat
 /.cache
+/.idea
+/cmake-build-*
