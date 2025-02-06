@@ -1,3 +1,4 @@
+#pragma once
 #include "gdr.hpp"
 
 struct PhysicsInput : gdr::Input {
