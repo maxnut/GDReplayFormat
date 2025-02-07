@@ -52,6 +52,9 @@ int main() {
     replay.description = "we testing up in here";
     replay.attempts = 50;
 
+    replay.deaths.push_back(5);
+    replay.deaths.push_back(1002);
+
     replay.inputs.push_back(MyInput(20, 1, false, true, 5.f));
     replay.inputs.push_back(MyInput(543, 1, false, false, 6.f));
     replay.inputs.push_back(MyInput(1002, 1, false, true, 7.f));
@@ -71,9 +74,13 @@ int main() {
     replay = std::move(importRes.unwrap());
 
     assert(replay.inputs.size() == 3);
+    assert(replay.deaths.size() == 2);
+    assert(replay.deaths[0] == 5);
+    assert(replay.deaths[0] == 1002);
     assert(replay.inputs[0].frame == 20); assert(replay.inputs[0].button == 1); assert(replay.inputs[0].player2 == false); assert(replay.inputs[0].down == true); assert(replay.inputs[0].xpos == 5.f);
     assert(replay.inputs[1].frame == 543); assert(replay.inputs[1].button == 1); assert(replay.inputs[1].player2 == false); assert(replay.inputs[1].down == false); assert(replay.inputs[1].xpos == 6.f);
     assert(replay.inputs[2].frame == 1002); assert(replay.inputs[2].button == 1); assert(replay.inputs[2].player2 == false); assert(replay.inputs[2].down == true); assert(replay.inputs[2].xpos == 7.f);
+    assert(replay.attempts == 50);
 
     return 0;
 }

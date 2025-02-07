@@ -144,9 +144,17 @@ public:
         stream << extensionStream.size();
         stream.write(extensionStream.data().data(), extensionStream.size());
 
-        stream << inputs.size();
+        stream << deaths.size();
 
         uint64_t p = 0;
+        for(uint64_t death : deaths) {
+            stream << death - p;
+            p = death;
+        }
+
+        stream << inputs.size();
+
+        p = 0;
         for (const InputType& input : inputs) {
             uint64_t delta = input.frame - p;
             uint8_t bitmask = ((input.button & 0b11) << 2) | (input.player2 << 1) | input.down;
@@ -194,11 +202,22 @@ public:
         binary_reader extensionStream(extensionData);
         r.parseExtension(extensionStream);
 
-        size_t inputSize;
-        stream >> inputSize;
-        r.inputs.reserve(inputSize);
+        size_t sizes;
+        stream >> sizes;
+        r.deaths.reserve(sizes);
 
         uint64_t p = 0;
+        for(size_t i = 0; i < sizes; i++) {
+            uint64_t delta;
+            stream >> delta;
+            r.deaths.push_back(delta + p);
+            p += delta;
+        }
+
+        stream >> sizes;
+        r.inputs.reserve(sizes);
+
+        p = 0;
         while (!stream.empty()) {
             InputType input;
             uint64_t delta;
@@ -249,5 +268,6 @@ public:
     Bot botInfo{};
     Level levelInfo{};
     std::vector<InputType> inputs;
+    std::vector<uint64_t> deaths;
 };
 }
