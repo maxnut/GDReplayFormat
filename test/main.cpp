@@ -1,8 +1,16 @@
 #include "gdr/gdr.hpp"
 
-#include <cassert>
 #include <cstdint>
 #include <iostream>
+
+void assert_(bool value, const char* message) {
+    if (value) return;
+    std::cerr << "Assert: '" << message << "' failed" <<  std::endl;
+    std::exit(1);
+}
+
+#undef assert
+#define assert(expr) assert_(expr, #expr)
 
 using namespace gdr;
 
@@ -76,7 +84,7 @@ int main() {
     assert(replay.inputs.size() == 3);
     assert(replay.deaths.size() == 2);
     assert(replay.deaths[0] == 5);
-    assert(replay.deaths[0] == 1002);
+    assert(replay.deaths[1] == 1002);
     assert(replay.inputs[0].frame == 20); assert(replay.inputs[0].button == 1); assert(replay.inputs[0].player2 == false); assert(replay.inputs[0].down == true); assert(replay.inputs[0].xpos == 5.f);
     assert(replay.inputs[1].frame == 543); assert(replay.inputs[1].button == 1); assert(replay.inputs[1].player2 == false); assert(replay.inputs[1].down == false); assert(replay.inputs[1].xpos == 6.f);
     assert(replay.inputs[2].frame == 1002); assert(replay.inputs[2].button == 1); assert(replay.inputs[2].player2 == false); assert(replay.inputs[2].down == true); assert(replay.inputs[2].xpos == 7.f);
