@@ -217,8 +217,8 @@ public:
     [[nodiscard]] bool empty() const noexcept { return m_data.empty(); }
 
     [[nodiscard]] const std::vector<uint8_t>& data() const noexcept { return m_data; }
-    std::vector<uint8_t>& data() && noexcept { return m_data; }
-    std::vector<uint8_t>& data() & noexcept { return m_data; }
+    std::vector<uint8_t>& data() noexcept { return m_data; }
+    std::vector<uint8_t> release() noexcept { return std::move(m_data); }
 
     bool save(const std::filesystem::path& path) const noexcept {
         std::ofstream file(path, std::ios::binary);
