@@ -1,7 +1,7 @@
 #pragma once
 #include "gdr.hpp"
 
-struct PhysicsInput : gdr::Input {
+struct PhysicsInput : gdr::Input<"Phys"> {
 	float xPosition;
     float yPosition;
     float rotation;

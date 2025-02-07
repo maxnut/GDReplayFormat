@@ -6,7 +6,7 @@
 
 using namespace gdr;
 
-struct MyInput : Input {
+struct MyInput : Input<"MyInput"> {
     float xpos;
 
     MyInput() = default;
