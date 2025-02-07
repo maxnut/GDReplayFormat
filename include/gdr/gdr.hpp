@@ -144,6 +144,8 @@ public:
         stream << extensionStream.size();
         stream.write(extensionStream.data().data(), extensionStream.size());
 
+        stream << inputs.size();
+
         uint64_t p = 0;
         for (const InputType& input : inputs) {
             uint64_t delta = input.frame - p;
@@ -191,6 +193,10 @@ public:
         stream.skip(extensionSize);
         binary_reader extensionStream(extensionData);
         r.parseExtension(extensionStream);
+
+        size_t inputSize;
+        stream >> inputSize;
+        r.inputs.reserve(inputSize);
 
         uint64_t p = 0;
         while (!stream.empty()) {
