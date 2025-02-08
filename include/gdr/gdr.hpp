@@ -327,7 +327,7 @@ public:
     float duration{};         /* Duration of the replay in seconds. */
     int gameVersion{};        /* Game version the replay was recorded on. (Example: 22074 for 2.2074, refer to GEODE_COMP_GD_VERSION) */
 
-    double framerate = 240.0; /* Framerate (ticks per second) of the replay. 240 by default, change if macro is recorded using physics bypass. */
+    double framerate = 240.0; /* Framerate (ticks per second) of the replay. 240 by default, change if replay is recorded using physics bypass. */
 
     int seed = 0;             /* Random seed set when at the start of the attempt. */
     int coins = 0;            /* Number of coins collected in the level. */
