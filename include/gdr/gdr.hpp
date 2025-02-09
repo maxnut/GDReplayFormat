@@ -165,7 +165,7 @@ public:
         stream << "GDR" << version << std::string(InputType::tag)
                 << author << description
                 << duration << gameVersion
-                << framerate << seed << coins << ldm
+                << framerate << seed << coins << ldm << platformer
                 << botInfo.name << botInfo.version
                 << levelInfo.id << levelInfo.name;
 
@@ -187,8 +187,14 @@ public:
         p = 0;
         for (const InputType& input : inputs) {
             uint64_t delta = input.frame - p;
-            uint8_t bitmask = ((input.button & 0b11) << 2) | (input.player2 << 1) | input.down;
-            uint64_t packed = (delta << 4) | bitmask;
+            uint8_t bitmask = (input.player2 << 1) | input.down;
+            uint64_t packed = 0;
+            if (platformer) {
+                bitmask |= (input.button & 0b11) << 2;
+                packed = (delta << 4) | bitmask;
+            }
+            else
+                packed = (delta << 5) | bitmask;
             stream << packed;
 
             if constexpr (input_has_extension) {
@@ -233,7 +239,7 @@ public:
         stream >> r.version >> inputTag
                 >> r.author >> r.description
                 >> r.duration >> r.gameVersion
-                >> r.framerate >> r.seed >> r.coins >> r.ldm
+                >> r.framerate >> r.seed >> r.coins >> r.ldm >> r.platformer
                 >> r.botInfo.name >> r.botInfo.version
                 >> r.levelInfo.id >> r.levelInfo.name;
 
@@ -276,10 +282,19 @@ public:
             uint8_t bitmask;
             uint64_t packed;
             stream >> packed;
-            delta = packed >> 4;
-            bitmask = packed & 0b1111;
+            
+            if(r.platformer) {
+                delta = packed >> 4;
+                bitmask = packed & 0b1111;
+                input.button = (bitmask >> 2) & 0b11;
+            }
+            else {
+                delta = packed >> 5;
+                bitmask = packed & 0b111;
+                input.button = 1;
+            }
+
             input.frame = delta + p;
-            input.button = (bitmask >> 2) & 0b11;
             input.player2 = (bitmask >> 1) & 1;
             input.down = bitmask & 1;
 
@@ -337,6 +352,7 @@ public:
     int coins = 0;            /* Number of coins collected in the level. */
 
     bool ldm = false;         /* Whether the replay was recorded in low detail mode. */
+    bool platformer = false;  /* Whether the replay was recorded in platformer mode. */
 
     Bot botInfo{};            /* Information about the bot that recorded the replay. */
     Level levelInfo{};        /* Information about the level the replay was recorded on. */

@@ -25,6 +25,7 @@ double framerate = 240.0;       /* Framerate (ticks per second) of the replay. 2
 int seed = 0;                   /* Random seed set when at the start of the attempt. */
 int coins = 0;                  /* Number of coins collected in the level. */
 bool ldm = false;               /* Whether the replay was recorded in low detail mode. */
+bool platformer = false;        /* Whether the replay was recorded in platformer mode. */
 Bot botInfo{};                  /* Information about the bot that recorded the replay. */
 Level levelInfo{};              /* Information about the level the replay was recorded on. */
 std::vector<InputType> inputs;  /* Refer to inputs section. */
@@ -168,6 +169,7 @@ Each GDR file consists of the following sections:
 | Seed        | `varint`  | Random seed used in gameplay |
 | Coins       | `varint`  | Number of coins collected |
 | LDM Enabled | `bool`    | Whether "Low Detail Mode" was enabled |
+| Platformer  | `bool`    | Whether the replay is platformer mode |
 | Bot Name    | `string`  | Name of the bot used to record the replay |
 | Bot Version | `varint`  | Version of the bot |
 | Level ID    | `varint`  | Level identifier |
@@ -196,6 +198,9 @@ Each input entry consists of:
 | Extension Size (Optional) | `varint` | Size of custom extension data |
 | Extension Data (Optional) | `bytes`  | Custom input extension data |
 
+If the replay is not platformer mode, the delta can go up to 15 frames and the input will fit in a single byte.
+Otherwise, the delta can go up to 7 frames.
+
 ### Bitmask Encoding
 The bitmask is a single `uint8_t` value encoding the input state:
 
@@ -203,4 +208,4 @@ The bitmask is a single `uint8_t` value encoding the input state:
 |-------------|---------|
 | 0           | Button press state (1 = down, 0 = up) |
 | 1           | Player 2 input flag (1 = player 2, 0 = player 1) |
-| 2-3         | Button ID (00 = None, 01 = Jump, 10 = Left, 11 = Right) |
+| 2-3 (Optional)   | Button ID (00 = None, 01 = Jump, 10 = Left, 11 = Right) |
