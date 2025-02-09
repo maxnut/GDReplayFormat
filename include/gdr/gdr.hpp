@@ -188,7 +188,8 @@ public:
         for (const InputType& input : inputs) {
             uint64_t delta = input.frame - p;
             uint8_t bitmask = ((input.button & 0b11) << 2) | (input.player2 << 1) | input.down;
-            stream << delta << bitmask;
+            uint64_t packed = (delta << 4) | bitmask;
+            stream << packed;
 
             if constexpr (input_has_extension) {
                 binary_writer inputExtensionStream;
@@ -273,7 +274,10 @@ public:
             InputType input;
             uint64_t delta;
             uint8_t bitmask;
-            stream >> delta >> bitmask;
+            uint64_t packed;
+            stream >> packed;
+            delta = packed >> 4;
+            bitmask = packed & 0b1111;
             input.frame = delta + p;
             input.button = (bitmask >> 2) & 0b11;
             input.player2 = (bitmask >> 1) & 1;

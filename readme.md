@@ -7,6 +7,7 @@ GDReplayFormat is a replay format meant to be usable by all bots.
 Replay data is stored in a compact binary format using:
 - Variable-length integer encoding (`varint`) to reduce storage size.
 - Delta encoding for frame data to reduce storage size.
+- Input packing for optimal storage (single byte in best-case scenario)
 - Optional extension support for custom replay metadata and input types.
 
 **Bot developers like you can add your own fields to GDR (like position data/frame fixes if you want) using the [Extensions](#extensions) feature**
@@ -184,15 +185,14 @@ Each GDR file consists of the following sections:
 | Field         | Type      | Description |
 |--------------|----------|-------------|
 | Input Count  | `varint`  | Number of input records |
-| Inputs       | `varint + byte + extension (optional)` | Input events |
+| Inputs       | `varint + extension (optional)` | Input events |
 
 ### Input Format
 Each input entry consists of:
 
 | Field       | Type      | Description |
 |------------|----------|-------------|
-| Frame Delta | `varint`  | Time difference from the previous input frame |
-| Bitmask     | `byte`    | Encoded button press information |
+| Packed | `varint`  | Input frame delta and button press bitmask packed in a single value |
 | Extension Size (Optional) | `varint` | Size of custom extension data |
 | Extension Data (Optional) | `bytes`  | Custom input extension data |
 
