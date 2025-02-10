@@ -38,21 +38,21 @@ public:
     /// @brief Unwraps the value as rvalue if it is Ok, otherwise throws bad_variant_access exception.
     constexpr OkType& unwrap() && { return std::get<OkContainer>(value).value; }
     /// @brief Unwraps the value if it is Ok, otherwise throws bad_variant_access exception.
-    constexpr const OkType& unwrap() const & { return std::get<OkContainer>(value).value; }
+    [[nodiscard]] constexpr const OkType& unwrap() const & { return std::get<OkContainer>(value).value; }
     /// @brief Unwraps the error as rvalue if it is Err, otherwise throws bad_variant_access exception.
     constexpr ErrType& unwrapErr() && { return std::get<ErrContainer>(value).value; }
     /// @brief Unwraps the error if it is Err, otherwise throws bad_variant_access exception.
-    constexpr const ErrType& unwrapErr() const & { return std::get<ErrContainer>(value).value; }
+    [[nodiscard]] constexpr const ErrType& unwrapErr() const & { return std::get<ErrContainer>(value).value; }
 
     /// @brief Returns true if the result is Ok.
-    constexpr bool isOk() const { return std::holds_alternative<OkContainer>(value); }
+    [[nodiscard]] constexpr bool isOk() const { return std::holds_alternative<OkContainer>(value); }
     /// @brief Returns true if the result is Err.
-    constexpr bool isErr() const { return std::holds_alternative<ErrContainer>(value); }
+    [[nodiscard]] constexpr bool isErr() const { return std::holds_alternative<ErrContainer>(value); }
 
     /// @brief Unwraps the value if it is Ok, otherwise returns the default value.
-    constexpr const OkType& unwrapOr(const OkType& def) const { return isOk() ? unwrap() : def; }
+    [[nodiscard]] constexpr const OkType& unwrapOr(const OkType& def) const { return isOk() ? unwrap() : def; }
     /// @brief Unwraps the error if it is Err, otherwise returns the default value.
-    constexpr const ErrType& unwrapErrOr(const ErrType& def) const { return isErr() ? unwrapErr() : def; }
+    [[nodiscard]] constexpr const ErrType& unwrapErrOr(const ErrType& def) const { return isErr() ? unwrapErr() : def; }
 
 private:
     std::variant<OkContainer, ErrContainer> value;
@@ -81,7 +81,7 @@ constexpr Result<O, std::string> Err(const char (&value)[S]) { return Err<O, std
 
 template <size_t S>
 struct StringLiteral {
-    char value[S];
+    char value[S]{};
     constexpr StringLiteral(const char (&value)[S]) {
         std::copy_n(value, S, this->value);
     }
@@ -139,10 +139,42 @@ class Replay {
 public:
     using InputType = T;
     using Self = std::conditional_t<std::is_same_v<S, void>, Replay, S>;
-    static constexpr bool input_has_extension = std::string_view(InputType::tag) != "";
+    static constexpr bool input_has_extension = !std::string_view(InputType::tag).empty();
 
+private:
+    /// @brief Chunk with following structure: [ ...delta | button | button | down ]
+    struct InputChunk {
+        uint64_t delta; // any number of bits
+        uint8_t button; // 2 bits
+        bool down;      // 1 bit
+
+        constexpr InputChunk(uint64_t delta, uint8_t button, bool down)
+            : delta(delta), button(button), down(down) {}
+        constexpr explicit InputChunk(uint64_t packed)
+            : delta(packed >> 3), button((packed >> 1) & 3), down(packed & 1) {}
+
+        constexpr operator uint64_t() const {
+            return (delta << 3) | (button << 1) | down;
+        }
+    };
+
+    /// @brief Chunk with following structure: [ ...delta | down ] (no button)
+    struct InputChunkNP {
+        uint64_t delta; // any number of bits
+        bool down;      // 1 bit
+
+        constexpr InputChunkNP(uint64_t delta, bool down)
+            : delta(delta), down(down) {}
+        constexpr explicit InputChunkNP(uint64_t packed)
+            : delta(packed >> 1), down(packed & 1) {}
+
+        constexpr operator uint64_t() const {
+            return (delta << 1) | down;
+        }
+    };
+
+public:
     Replay() = default;
-
     Replay(std::string const& botName, int botVersion)
         : botInfo(botName, botVersion) {}
 
@@ -158,8 +190,15 @@ public:
     /// @brief Get current version of the replay format.
     [[nodiscard]] int getVersion() const { return version; }
 
+    /// @brief Sort the inputs by frame number.
+    void sortInputs() {
+        std::sort(inputs.begin(), inputs.end(), [](const InputType& a, const InputType& b) {
+            return a.frame < b.frame;
+        });
+    }
+
     /// @brief Export the replay to a byte array. Returns an error if the data is invalid.
-    [[nodiscard]] Result<std::vector<uint8_t>> exportData() const {
+    [[nodiscard]] Result<std::vector<uint8_t>> exportData() {
         binary_writer stream;
 
         stream << "GDR" << version << std::string(InputType::tag)
@@ -184,17 +223,46 @@ public:
 
         stream << inputs.size();
 
+        sortInputs();
+
+        // write number of player 1 inputs
+        size_t p1Inputs = std::count_if(inputs.begin(), inputs.end(), [](const InputType& input) { return !input.player2; });
+        stream << p1Inputs;
+
+        // save player 1 inputs
         p = 0;
         for (const InputType& input : inputs) {
-            uint64_t delta = input.frame - p;
-            uint8_t bitmask = (input.player2 << 1) | input.down;
+            if (input.player2) continue;
+
             uint64_t packed = 0;
             if (platformer) {
-                bitmask |= (input.button & 0b11) << 2;
-                packed = (delta << 4) | bitmask;
+                packed = InputChunk(input.frame - p, input.button, input.down);
+            } else {
+                packed = InputChunkNP(input.frame - p, input.down);
             }
-            else
-                packed = (delta << 5) | bitmask;
+            stream << packed;
+
+            if constexpr (input_has_extension) {
+                binary_writer inputExtensionStream;
+                input.saveExtension(inputExtensionStream);
+                stream << inputExtensionStream.size();
+                stream.write(inputExtensionStream.data().data(), inputExtensionStream.size());
+            }
+
+            p = input.frame;
+        }
+
+        // save player 2 inputs
+        p = 0;
+        for (const InputType& input : inputs) {
+            if (!input.player2) continue;
+
+            uint64_t packed = 0;
+            if (platformer) {
+                packed = InputChunk(input.frame - p, input.button, input.down);
+            } else {
+                packed = InputChunkNP(input.frame - p, input.down);
+            }
             stream << packed;
 
             if constexpr (input_has_extension) {
@@ -211,7 +279,7 @@ public:
     }
 
     /// @brief Export the replay to a file. Returns an error if the file cannot be opened or written to.
-    [[nodiscard]] Result<> exportData(const std::filesystem::path& path) const {
+    [[nodiscard]] Result<> exportData(const std::filesystem::path& path) {
         auto res = exportData();
         if (res.isErr()) return Err<>(res.unwrapErr());
 
@@ -229,7 +297,7 @@ public:
         binary_reader stream(data);
         Self r;
 
-        std::array<char, 3> magic;
+        std::array<char, 3> magic{};
         stream.read(magic);
         if (std::string_view(magic.data(), magic.size()) != "GDR") {
             return Err<Self>("Invalid magic: " + std::string(magic.data(), magic.size()));
@@ -275,28 +343,28 @@ public:
         stream >> sizes;
         r.inputs.reserve(sizes);
 
+        size_t p1Inputs;
+        stream >> p1Inputs;
+
         p = 0;
         while (!stream.empty()) {
             InputType input;
-            uint64_t delta;
-            uint8_t bitmask;
             uint64_t packed;
             stream >> packed;
             
-            if(r.platformer) {
-                delta = packed >> 4;
-                bitmask = packed & 0b1111;
-                input.button = (bitmask >> 2) & 0b11;
+            if (r.platformer) {
+                auto chunk = InputChunk(packed);
+                input.frame = chunk.delta + p;
+                input.button = chunk.button;
+                input.player2 = p1Inputs == 0;
+                input.down = chunk.down;
+            } else {
+                auto chunk = InputChunkNP(packed);
+                input.frame = chunk.delta + p;
+                input.button = 1; // default to jump
+                input.player2 = p1Inputs == 0;
+                input.down = chunk.down;
             }
-            else {
-                delta = packed >> 5;
-                bitmask = packed & 0b111;
-                input.button = 1;
-            }
-
-            input.frame = delta + p;
-            input.player2 = (bitmask >> 1) & 1;
-            input.down = bitmask & 1;
 
             if (hasInputExt) {
                 size_t inputExtensionSize;
@@ -315,7 +383,18 @@ public:
 
             r.inputs.push_back(std::move(input));
             p = input.frame;
+
+            // check if we read all player 1 inputs
+            if (p1Inputs > 0) {
+                p1Inputs--;
+                if (p1Inputs == 0) {
+                    p = 0;
+                }
+            }
         }
+
+        // sort inputs because right now p2 inputs are after p1 inputs (we want them to be interleaved)
+        r.sortInputs();
 
         return Ok(std::move(r));
     }
