@@ -223,8 +223,6 @@ public:
 
         stream << inputs.size();
 
-        sortInputs();
-
         // write number of player 1 inputs
         size_t p1Inputs = std::count_if(inputs.begin(), inputs.end(), [](const InputType& input) { return !input.player2; });
         stream << p1Inputs;

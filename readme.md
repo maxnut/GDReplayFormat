@@ -187,6 +187,7 @@ Each GDR file consists of the following sections:
 | Field         | Type      | Description |
 |--------------|----------|-------------|
 | Input Count  | `varint`  | Number of input records |
+| P1 Input Count  | `varint`  | Number of player1 input records |
 | Inputs       | `varint + extension (optional)` | Input events |
 
 ### Input Format
@@ -198,8 +199,8 @@ Each input entry consists of:
 | Extension Size (Optional) | `varint` | Size of custom extension data |
 | Extension Data (Optional) | `bytes`  | Custom input extension data |
 
-If the replay is not platformer mode, the delta can go up to 15 frames and the input will fit in a single byte.
-Otherwise, the delta can go up to 7 frames.
+If the replay is not platformer mode, the delta can go up to 63 frames and the input will fit in a single byte.
+Otherwise, the delta can go up to 15 frames.
 
 ### Bitmask Encoding
 The bitmask is a single `uint8_t` value encoding the input state:
@@ -207,5 +208,4 @@ The bitmask is a single `uint8_t` value encoding the input state:
 | Bit Position | Meaning |
 |-------------|---------|
 | 0           | Button press state (1 = down, 0 = up) |
-| 1           | Player 2 input flag (1 = player 2, 0 = player 1) |
-| 2-3 (Optional)   | Button ID (00 = None, 01 = Jump, 10 = Left, 11 = Right) |
+| 1-2 (Optional)   | Button ID (00 = None, 01 = Jump, 10 = Left, 11 = Right) |
