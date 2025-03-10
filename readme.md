@@ -137,6 +137,14 @@ struct MyReplay : Replay<MyReplay, MyInput> {
 
 These extensions can be accessed the same way you access regular fields
 
+### Extension parsing
+
+Extension parsing depends on two things:
+- Replay's `shouldParseExtension()` virtual method, that you should override and implement logic to check if extensions should be parsed (or just `return true`)
+- The Replay's input tag, which will be compared against the input tag of the loaded replay
+
+If both conditions are matched, the extensions will be parsed. Otherwise they will be skipped.
+
 ## Migrating from GDR 1
 
 - The file format has completely changed. If you want to keep GDR 1 support we suggest using the [converter](https://github.com/maxnut/GDR-converter).
@@ -150,6 +158,14 @@ Each GDR file consists of the following sections:
 2. **Replay Metadata**
 4. **Death Frames**
 5. **Input Data**
+
+## Data types
+| Type     | Description |
+|----------|-------------|
+| `varint` | LEB128 variable size integer |
+| `string` | Null terminated string (cstring) |
+| `bool`   | Single byte |
+
 
 ## Header
 | Field         | Type  | Description                         |
@@ -199,13 +215,25 @@ Each input entry consists of:
 | Extension Size (Optional) | `varint` | Size of custom extension data |
 | Extension Data (Optional) | `bytes`  | Custom input extension data |
 
-If the replay is not platformer mode, the delta can go up to 63 frames and the input will fit in a single byte.
-Otherwise, the delta can go up to 15 frames.
+### Packed Encoding
+The packed field is a `varint` composed of the bitmask and frame delta packed together.
 
-### Bitmask Encoding
-The bitmask is a single `uint8_t` value encoding the input state:
+The bitmask encodes the input state, and the remaining bits are used to encode the frame delta. 
 
+#### Non-platformer input
+| Bit Position | Meaning |
+|-------------|--------- |
+| 0           | `varint` bit indicating if the value continues to the next byte |
+| 1           | Button press state (1 = down, 0 = up) |
+| 2-7         | Frame delta |
+#### Platformer input
 | Bit Position | Meaning |
 |-------------|---------|
-| 0           | Button press state (1 = down, 0 = up) |
-| 1-2 (Optional)   | Button ID (00 = None, 01 = Jump, 10 = Left, 11 = Right) |
+| 0           | `varint` bit indicating if the value continues to the next byte |
+| 1           | Button press state (1 = down, 0 = up) |
+| 2-3         | Button ID (00 = None, 01 = Jump, 10 = Left, 11 = Right) |
+| 4-7         | Frame delta
+
+Then the value continues like a normal `varint`
+
+Thanks to this, the input delta can go as high as 63 frames in non platformer replays, or 15 in platformer replays, while maintaining the input in a single byte.
