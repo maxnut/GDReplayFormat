@@ -206,6 +206,10 @@ Each GDR file consists of the following sections:
 | P1 Input Count  | `varint`  | Number of player1 input records |
 | Inputs       | `varint + extension (optional)` | Input events |
 
+The inputs are stored as all P1 Inputs and then all P2 Inputs. Use P1 Input Count to know when P2 Inputs start.
+
+**This requires inputs to be sorted after parsing!**
+
 ### Input Format
 Each input entry consists of:
 
