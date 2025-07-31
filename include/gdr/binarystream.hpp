@@ -171,7 +171,7 @@ public:
     }
 
     [[nodiscard]] std::span<uint8_t> peek(size_t size) const noexcept {
-        return {m_data.begin(), m_data.begin() + static_cast<int32_t>(size)};
+        return {&*m_data.begin(), &*m_data.begin() + size};
     }
 
     [[nodiscard]] uint8_t peek() const noexcept {
