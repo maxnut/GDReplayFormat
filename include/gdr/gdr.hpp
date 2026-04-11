@@ -192,7 +192,7 @@ public:
 
     /// @brief Sort the inputs by frame number.
     void sortInputs() {
-        std::sort(inputs.begin(), inputs.end(), [](const InputType& a, const InputType& b) {
+        std::stable_sort(inputs.begin(), inputs.end(), [](const InputType& a, const InputType& b) {
             return a.frame < b.frame;
         });
     }
